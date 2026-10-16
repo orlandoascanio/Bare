@@ -24,6 +24,16 @@ enum Category: String, CaseIterable {
         }
     }
 
+    /// Compact name for tight spots like the onboarding cards.
+    var shortTitle: String {
+        switch self {
+        case .screenshots: return "Screenshots"
+        case .images: return "Photos"
+        case .archives: return "Archives & DMGs"
+        default: return title
+        }
+    }
+
     var symbol: String {
         switch self {
         case .folders: return "folder"

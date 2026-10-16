@@ -21,7 +21,7 @@ On Windows this is right-click → View → Show desktop icons. On macOS people 
 - **Auto-hide new items**: new screenshots and downloads disappear as soon as they land.
 - Prefer a plain menu? Turn off **Click icon to hide** in Options and a single click opens the menu instead.
 - **Launch at login**, and an option to **show everything again when quitting**.
-- A short welcome window on first launch (reopen it any time from **How It Works…**).
+- A 3-step interactive welcome on first launch, with a live mini Desktop you can try it on (reopen it any time from **How It Works…**).
 - No Dock icon, no network access, no analytics, no accounts.
 
 ## Install

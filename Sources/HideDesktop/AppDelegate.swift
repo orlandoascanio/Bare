@@ -266,8 +266,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func showOnboarding() {
         settings.onboardingDone = true
-        WindowPresenter.show(id: "onboarding", title: "Welcome to HideDesktop") {
-            OnboardingView { WindowPresenter.close(id: "onboarding") }
+        let counts = Dictionary(grouping: hider.scan(), by: \.category).mapValues(\.count)
+        let model = OnboardingModel(counts: counts,
+                                    apply: { [weak self] in self?.hider.apply() },
+                                    toggle: { [weak self] in self?.toggleHiding() })
+        WindowPresenter.show(id: "onboarding", title: "Welcome to HideDesktop", translucent: true) {
+            OnboardingView(model: model) { WindowPresenter.close(id: "onboarding") }
         }
     }
 
