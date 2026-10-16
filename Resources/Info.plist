@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>HideDesktop</string>
+    <key>CFBundleDisplayName</key>
+    <string>HideDesktop</string>
+    <key>CFBundleIdentifier</key>
+    <string>io.github.hidedesktop</string>
+    <key>CFBundleExecutable</key>
+    <string>HideDesktop</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>13.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>HideDesktop hides the items on your Desktop by setting their "hidden" flag. Nothing is moved or deleted.</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>MIT License. Free and open source.</string>
+</dict>
+</plist>
