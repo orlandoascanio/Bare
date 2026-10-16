@@ -18,7 +18,12 @@ rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$OUT/Contents/Resources"
 cp "$BIN" "$OUT/Contents/MacOS/$APP"
 cp Resources/Info.plist "$OUT/Contents/Info.plist"
-codesign --force --sign - "$OUT"
+# IDENTITY="Developer ID Application: …" signs for distribution (see release.sh); default is ad-hoc.
+if [[ -n "${IDENTITY:-}" ]]; then
+    codesign --force --options runtime --timestamp --sign "$IDENTITY" "$OUT"
+else
+    codesign --force --sign - "$OUT"
+fi
 
 echo "Built $OUT"
 
