@@ -126,35 +126,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(header("What to Hide"))
 
+        // Common path up front, the fine-grained choices one level deeper.
+        let isEverything = enabled == Set(Category.allCases)
+
         let everything = item("Everything", #selector(selectEverything), symbol: "square.stack.3d.up.slash")
-        everything.state = enabled == Set(Category.allCases) ? .on : .off
+        everything.state = isEverything ? .on : .off
         menu.addItem(everything)
 
+        let types = NSMenu()
+        types.addItem(header("File Types"))
         for category in Category.allCases {
             let count = counts[category] ?? 0
             let mi = item("\(category.title)  (\(count))", #selector(toggleCategory(_:)), symbol: category.symbol)
             mi.representedObject = category.rawValue
             mi.state = enabled.contains(category) ? .on : .off
-            mi.indentationLevel = 1
-            menu.addItem(mi)
+            types.addItem(mi)
         }
 
-        let drives = item("Disks, Drives & Servers", #selector(toggleDrives), symbol: "externaldrive")
+        types.addItem(.separator())
+        types.addItem(header("Quick Picks"))
+        types.addItem(presetItem("Only Folders", [.folders]))
+        types.addItem(presetItem("Only Files (keep folders visible)",
+                                 Set(Category.allCases).subtracting([.folders])))
+        types.addItem(presetItem("Only Screenshots & Recordings", [.screenshots]))
+        types.addItem(presetItem("Only Photos, Screenshots & Videos", [.images, .screenshots, .media]))
+        types.addItem(presetItem("Everything except Apps & Aliases",
+                                 Set(Category.allCases).subtracting([.apps])))
+
+        let chooser = item("Choose Types", nil, symbol: "line.3.horizontal.decrease.circle")
+        chooser.state = isEverything ? .off : .on
+        chooser.submenu = types
+        if #available(macOS 14.4, *), !isEverything { chooser.subtitle = summary(of: enabled) }
+        menu.addItem(chooser)
+
+        let drives = item("Also Hide Disks & Servers", #selector(toggleDrives), symbol: "externaldrive")
         drives.state = settings.hideDrives ? .on : .off
         drives.toolTip = "Uses Finder's own setting. Finder relaunches when this changes."
         menu.addItem(drives)
-
-        let presets = NSMenu()
-        presets.addItem(presetItem("Only Folders", [.folders]))
-        presets.addItem(presetItem("Only Files (keep folders visible)",
-                                   Set(Category.allCases).subtracting([.folders])))
-        presets.addItem(presetItem("Only Screenshots & Recordings", [.screenshots]))
-        presets.addItem(presetItem("Only Photos, Screenshots & Videos", [.images, .screenshots, .media]))
-        presets.addItem(presetItem("Everything except Apps & Aliases",
-                                   Set(Category.allCases).subtracting([.apps])))
-        let presetsItem = item("Presets", nil, symbol: "slider.horizontal.3")
-        presetsItem.submenu = presets
-        menu.addItem(presetsItem)
 
         menu.addItem(.separator())
         menu.addItem(header("Options"))
@@ -181,6 +189,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         mi.target = self
         if let symbol { mi.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil) }
         return mi
+    }
+
+    /// "Folders, Screenshots & Recordings +2" style summary for the Choose Types row.
+    private func summary(of enabled: Set<Category>) -> String {
+        let picked = Category.allCases.filter(enabled.contains).map(\.title)
+        guard !picked.isEmpty else { return "Nothing selected" }
+        let shown = picked.prefix(2).joined(separator: ", ")
+        return picked.count > 2 ? "\(shown) +\(picked.count - 2)" : shown
     }
 
     private func option(_ title: String, _ on: Bool, _ action: Selector) -> NSMenuItem {

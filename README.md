@@ -7,7 +7,7 @@ On Windows this is right-click → View → Show desktop icons. On macOS people 
 ## Features
 
 - **Click the menu bar icon to hide/show.** Double-click (or right-click) it to open the menu. Or use the global shortcut **⌃⌥⌘H** (Control-Option-Command-H) from anywhere.
-- **Choose what to hide**, with a live count for each type:
+- **Everything** in one click, or **Choose Types ▸** to pick exactly what goes, with a live count for each:
   - Folders
   - Screenshots & Recordings
   - Images & Photos
@@ -16,8 +16,8 @@ On Windows this is right-click → View → Show desktop icons. On macOS people 
   - Archives, DMGs & Installers
   - Apps & Aliases
   - Other Files
-  - Disks, Drives & Servers (uses Finder's own setting; Finder relaunches when this changes)
-- **Presets**: Only Folders · Only Files · Only Screenshots · Only Photos/Screenshots/Videos · Everything except Apps.
+- **Quick picks** in the same submenu: Only Folders · Only Files · Only Screenshots · Only Photos/Screenshots/Videos · Everything except Apps.
+- **Also Hide Disks & Servers** (uses Finder's own setting; Finder relaunches when this changes).
 - **Auto-hide new items**: new screenshots and downloads disappear as soon as they land.
 - Prefer a plain menu? Turn off **Click icon to hide** in Options and a single click opens the menu instead.
 - **Launch at login**, and an option to **show everything again when quitting**.
