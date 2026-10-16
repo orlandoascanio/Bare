@@ -1,5 +1,4 @@
 import AppKit
-import Carbon.HIToolbox
 import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
@@ -7,7 +6,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let hider = DesktopHider()
     private let menu = NSMenu()
     private var statusItem: NSStatusItem!
-    private var hotKey: HotKey?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -21,10 +19,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hider.onChange = { [weak self] in self?.updateIcon() }
         hider.startWatching()
         hider.apply()
-        updateHotKey()
+        HotKeyManager.shared.action = { [weak self] in self?.toggleHiding() }
+        HotKeyManager.shared.reload()
         updateIcon()
 
-        if hider.lastError != nil { showDesktopAccessAlert() }
+        if !settings.onboardingDone {
+            showOnboarding()
+        } else if hider.lastError != nil {
+            showDesktopAccessAlert()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -89,16 +92,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             ? "Desktop icons hidden (\(hider.hiddenCount))" : "Desktop icons visible"
     }
 
-    // MARK: Hot key  (⌃⌥⌘H)
-
-    private func updateHotKey() {
-        hotKey = nil
-        guard settings.hotKeyEnabled else { return }
-        hotKey = HotKey(keyCode: kVK_ANSI_H, modifiers: controlKey | optionKey | cmdKey) { [weak self] in
-            self?.toggleHiding()
-        }
-    }
-
     // MARK: Menu
 
     func menuNeedsUpdate(_ menu: NSMenu) {
@@ -109,8 +102,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let main = item(settings.isHiding ? "Show Desktop Icons" : "Hide Desktop Icons",
                         #selector(toggleHiding), symbol: settings.isHiding ? "eye" : "eye.slash")
-        main.keyEquivalent = "h"
-        main.keyEquivalentModifierMask = [.control, .option, .command]
+        if let shortcut = HotKeyManager.shared.shortcut, let key = shortcut.menuKeyEquivalent {
+            main.keyEquivalent = key
+            main.keyEquivalentModifierMask = shortcut.menuModifiers
+        }
         menu.addItem(main)
 
         let status: String
@@ -166,19 +161,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         menu.addItem(.separator())
         menu.addItem(header("Options"))
-        menu.addItem(option("Auto-hide new items (screenshots, downloads…)", settings.autoHideNew,
-                            #selector(toggleAutoHide)))
-        menu.addItem(option("Global shortcut ⌃⌥⌘H", settings.hotKeyEnabled, #selector(toggleHotKey)))
-        menu.addItem(option("Click icon to hide · double-click for menu", settings.clickToToggle,
-                            #selector(toggleClickMode)))
-        menu.addItem(option("Show icons again when quitting", settings.restoreOnQuit,
-                            #selector(toggleRestoreOnQuit)))
-        menu.addItem(option("Launch at login", SMAppService.mainApp.status == .enabled,
+        menu.addItem(option("Click Icon to Hide", settings.clickToToggle, #selector(toggleClickMode)))
+        menu.addItem(option("Auto-Hide New Items", settings.autoHideNew, #selector(toggleAutoHide)))
+        menu.addItem(option("Show Icons When Quitting", settings.restoreOnQuit, #selector(toggleRestoreOnQuit)))
+        menu.addItem(option("Launch at Login", SMAppService.mainApp.status == .enabled,
                             #selector(toggleLaunchAtLogin)))
+        let shortcutItem = item("Keyboard Shortcut…", #selector(showShortcutSettings), symbol: "keyboard")
+        if #available(macOS 14.4, *) { shortcutItem.subtitle = HotKeyManager.shared.shortcut?.display ?? "Off" }
+        menu.addItem(shortcutItem)
 
         menu.addItem(.separator())
         menu.addItem(item("Open Desktop Folder", #selector(openDesktop), symbol: "folder"))
-        menu.addItem(disabled("HideDesktop — free & open source"))
+        menu.addItem(item("How It Works…", #selector(showOnboarding), symbol: "questionmark.circle"))
+        menu.addItem(item("HideDesktop Website", #selector(openWebsite), symbol: "globe"))
         let quit = item("Quit HideDesktop", #selector(quit), symbol: "power")
         quit.keyEquivalent = "q"
         menu.addItem(quit)
@@ -265,10 +260,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if settings.autoHideNew { hider.apply() }
     }
 
-    @objc private func toggleHotKey() {
-        settings.hotKeyEnabled.toggle()
-        updateHotKey()
+    @objc private func showShortcutSettings() {
+        WindowPresenter.show(id: "shortcut", title: "Keyboard Shortcut") { ShortcutSettingsView() }
     }
+
+    @objc private func showOnboarding() {
+        settings.onboardingDone = true
+        WindowPresenter.show(id: "onboarding", title: "Welcome to HideDesktop") {
+            OnboardingView { WindowPresenter.close(id: "onboarding") }
+        }
+    }
+
+    @objc private func openWebsite() { NSWorkspace.shared.open(Links.website) }
 
     @objc private func toggleClickMode() { settings.clickToToggle.toggle() }
 

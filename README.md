@@ -6,7 +6,7 @@ On Windows this is right-click → View → Show desktop icons. On macOS people 
 
 ## Features
 
-- **Click the menu bar icon to hide/show.** Double-click (or right-click) it to open the menu. Or use the global shortcut **⌃⌥⌘H** (Control-Option-Command-H) from anywhere.
+- **Click the menu bar icon to hide/show.** Double-click (or right-click) it to open the menu. Or use a global shortcut from any app: **⌃⌥⌘H** by default, and you can change it to whatever you like (menu → Keyboard Shortcut…).
 - **Everything** in one click, or **Choose Types ▸** to pick exactly what goes, with a live count for each:
   - Folders
   - Screenshots & Recordings
@@ -21,6 +21,7 @@ On Windows this is right-click → View → Show desktop icons. On macOS people 
 - **Auto-hide new items**: new screenshots and downloads disappear as soon as they land.
 - Prefer a plain menu? Turn off **Click icon to hide** in Options and a single click opens the menu instead.
 - **Launch at login**, and an option to **show everything again when quitting**.
+- A short welcome window on first launch (reopen it any time from **How It Works…**).
 - No Dock icon, no network access, no analytics, no accounts.
 
 ## Install
@@ -60,10 +61,14 @@ Sources/HideDesktop/
   DesktopHider.swift  hide/show logic, Desktop watcher, drive settings
   Classifier.swift    decides which category a Desktop item belongs to
   Settings.swift      categories and saved preferences
-  HotKey.swift        global ⌃⌥⌘H shortcut (no Accessibility permission needed)
+  Shortcut.swift      editable global shortcut + its storage
+  HotKey.swift        registers the shortcut (no Accessibility permission needed)
+  Windows.swift       welcome window, shortcut recorder
 Resources/Info.plist
 build.sh
 ```
+
+Website: https://www.orlandoascanio.com/products/hidedesktop
 
 ## License
 

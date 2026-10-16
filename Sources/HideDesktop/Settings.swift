@@ -91,6 +91,16 @@ final class Settings {
         set { d.set(newValue, forKey: "hotKeyEnabled") }
     }
 
+    var shortcut: Shortcut {
+        get { Shortcut(dictionary: d.dictionary(forKey: "shortcut")) ?? .default }
+        set { d.set(newValue.dictionary, forKey: "shortcut") }
+    }
+
+    var onboardingDone: Bool {
+        get { d.bool(forKey: "onboardingDone") }
+        set { d.set(newValue, forKey: "onboardingDone") }
+    }
+
     // MARK: Internal bookkeeping
 
     /// Names of Desktop items *this app* hid, so we only ever un-hide those
