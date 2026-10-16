@@ -54,6 +54,7 @@ final class Settings {
     private let d = UserDefaults.standard
 
     private init() {
+        Self.migrateFromOldName(d)
         d.register(defaults: [
             "isHiding": false,
             "enabledCategories": Category.allCases.map(\.rawValue),
@@ -63,6 +64,19 @@ final class Settings {
             "clickToToggle": true,
             "hotKeyEnabled": true,
         ])
+    }
+
+    /// The app used to be called HideDesktop. Carry its settings over once, most importantly the list
+    /// of items it hid, so they can still be shown again.
+    private static func migrateFromOldName(_ d: UserDefaults) {
+        guard !d.bool(forKey: "migratedFromHideDesktop") else { return }
+        d.set(true, forKey: "migratedFromHideDesktop")
+        let old = "io.github.hidedesktop" as CFString
+        guard let keys = CFPreferencesCopyKeyList(old, kCFPreferencesCurrentUser, kCFPreferencesAnyHost) as? [String]
+        else { return }
+        for key in keys where d.object(forKey: key) == nil {
+            if let value = CFPreferencesCopyAppValue(key as CFString, old) { d.set(value, forKey: key) }
+        }
     }
 
     var isHiding: Bool {

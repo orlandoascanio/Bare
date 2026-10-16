@@ -4,7 +4,7 @@ import ServiceManagement
 import SwiftUI
 
 enum Links {
-    static let website = URL(string: "https://www.orlandoascanio.com/products/hidedesktop")!
+    static let website = URL(string: "https://www.orlandoascanio.com/products/bare")!
 }
 
 // MARK: - Window presenting
@@ -131,7 +131,7 @@ struct ShortcutRecorder: View {
                         .foregroundStyle(model.isRecording && model.liveModifiers.isEmpty ? .secondary : .primary)
                         .frame(minWidth: 120)
                 }
-                .controlSize(compact ? .regular : .large)
+                .buttonStyle(TintedButtonStyle())
                 .help(model.isRecording ? "Press the new keys · Esc to cancel" : "Click to change")
 
                 if model.shortcut != nil && !model.isRecording {
@@ -182,5 +182,6 @@ struct ShortcutSettingsView: View {
         .padding(.top, 34)
         .padding(.bottom, 26)
         .frame(width: 340)
+        .tint(.brand)
     }
 }

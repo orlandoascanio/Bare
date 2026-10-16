@@ -85,6 +85,7 @@ struct OnboardingView: View {
         }
         .frame(width: 600)
         .background(VisualEffect().ignoresSafeArea())
+        .tint(.brand)
     }
 
     // What the mini desktop shows on each step.
@@ -140,11 +141,9 @@ struct OnboardingView: View {
             Button {
                 if page < pageCount - 1 { go(to: page + 1) } else { onDone() }
             } label: {
-                Text(page < pageCount - 1 ? "Continue" : "Start Using HideDesktop")
-                    .padding(.horizontal, 6)
+                Text(page < pageCount - 1 ? "Continue" : "Start Using Bare")
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+            .buttonStyle(PrimaryButtonStyle())
             .keyboardShortcut(.defaultAction)
             .frame(width: 200, alignment: .trailing)
         }
@@ -154,11 +153,18 @@ struct OnboardingView: View {
 // MARK: - Pages
 
 private struct PageHeader: View {
+    var eyebrow: String? = nil
     let title: String
     let subtitle: String
 
     var body: some View {
         VStack(spacing: 8) {
+            if let eyebrow {
+                Text(eyebrow)
+                    .font(.system(size: 11, weight: .semibold))
+                    .tracking(1.2)
+                    .foregroundStyle(.tint)
+            }
             Text(title)
                 .font(.system(size: 26, weight: .bold))
                 .tracking(-0.4)
@@ -179,7 +185,7 @@ private struct TryItPage: View {
 
     var body: some View {
         VStack(spacing: 22) {
-            PageHeader(title: "Your Desktop, out of sight.",
+            PageHeader(eyebrow: "WELCOME TO BARE", title: "Your Desktop, out of sight.",
                        subtitle: "Click the eye in the menu bar to hide every icon.\nClick it again and they're back. Try it above.")
 
             HStack(spacing: 10) {
@@ -275,10 +281,10 @@ private struct CategoryCard: View {
             .frame(height: 34)
             .background(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(isOn ? AnyShapeStyle(Color.accentColor.opacity(0.12)) : AnyShapeStyle(.quaternary.opacity(0.5))))
+                    .fill(isOn ? AnyShapeStyle(Color.brand.opacity(0.12)) : AnyShapeStyle(.quaternary.opacity(0.5))))
             .overlay(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .strokeBorder(isOn ? Color.accentColor.opacity(0.45) : .clear, lineWidth: 1))
+                    .strokeBorder(isOn ? Color.brand.opacity(0.45) : .clear, lineWidth: 1))
             .contentShape(Rectangle())
         }
         .buttonStyle(PressableStyle())
@@ -310,7 +316,7 @@ private struct MakeItYoursPage: View {
             }
             .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            Label("Nothing is ever moved or deleted. HideDesktop only flips macOS's own “hidden” flag.",
+            Label("Nothing is ever moved or deleted. Bare only flips macOS's own “hidden” flag.",
                   systemImage: "lock.shield")
                 .font(.system(size: 11.5))
                 .foregroundStyle(.secondary)
@@ -330,7 +336,7 @@ private struct SettingRow<Trailing: View>: View {
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(.white)
                 .frame(width: 26, height: 26)
-                .background(Color.accentColor.gradient, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                .background(Color.brand.gradient, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
             VStack(alignment: .leading, spacing: 1) {
                 Text(title).font(.system(size: 13, weight: .medium))
                 Text(detail).font(.system(size: 11.5)).foregroundStyle(.secondary)
@@ -489,6 +495,15 @@ private struct Wallpaper: View {
 
 // MARK: - Bits
 
+extension Color {
+    /// Bare's lilac. Deeper in light mode so white button text stays readable, softer in dark mode.
+    static let brand = Color(nsColor: NSColor(name: "BareLilac") { appearance in
+        appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            ? NSColor(srgbRed: 0.69, green: 0.58, blue: 1.0, alpha: 1)   // #B094FF
+            : NSColor(srgbRed: 0.55, green: 0.39, blue: 0.90, alpha: 1)  // #8C63E6
+    })
+}
+
 private struct PageDots: View {
     let count: Int
     let current: Int
@@ -497,11 +512,45 @@ private struct PageDots: View {
         HStack(spacing: 6) {
             ForEach(0..<count, id: \.self) { i in
                 Capsule()
-                    .fill(i == current ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
+                    .fill(i == current ? AnyShapeStyle(Color.brand) : AnyShapeStyle(.tertiary))
                     .frame(width: i == current ? 18 : 6, height: 6)
             }
         }
         .animation(.spring(response: 0.35, dampingFraction: 1), value: current)
+    }
+}
+
+/// The filled lilac call-to-action. Stays lilac even when the window isn't focused.
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 13.5, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 20)
+            .frame(height: 36)
+            .background(Color.brand.gradient, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .shadow(color: Color.brand.opacity(configuration.isPressed ? 0.2 : 0.4),
+                    radius: configuration.isPressed ? 2 : 7, y: configuration.isPressed ? 1 : 3)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .brightness(configuration.isPressed ? -0.06 : 0)
+            .animation(.spring(response: 0.2, dampingFraction: 1), value: configuration.isPressed)
+            .contentShape(Rectangle())
+    }
+}
+
+/// Secondary lilac button: tinted text on a soft lilac fill.
+struct TintedButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 13, weight: .medium))
+            .foregroundStyle(Color.brand)
+            .padding(.horizontal, 12)
+            .frame(height: 28)
+            .background(Color.brand.opacity(configuration.isPressed ? 0.24 : 0.14),
+                        in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(response: 0.2, dampingFraction: 1), value: configuration.isPressed)
+            .contentShape(Rectangle())
     }
 }
 

@@ -2,9 +2,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "HideDesktop",
+    name: "Bare",
     platforms: [.macOS(.v13)],
     targets: [
-        .executableTarget(name: "HideDesktop", path: "Sources/HideDesktop")
+        .executableTarget(name: "Bare", path: "Sources/Bare")
     ]
 )

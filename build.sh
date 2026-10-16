@@ -1,9 +1,9 @@
 #!/bin/bash
-# Builds HideDesktop.app into ./build. Pass --install to copy it to /Applications and launch it.
+# Builds Bare.app into ./build. Pass --install to copy it to /Applications and launch it.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP=HideDesktop
+APP=Bare
 OUT="build/$APP.app"
 
 ARCHS=(--arch arm64 --arch x86_64)

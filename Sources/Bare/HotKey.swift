@@ -17,7 +17,7 @@ final class HotKey {
             }, 1, &spec, nil, &HotKey.handler)
         }
 
-        let id = EventHotKeyID(signature: OSType(0x4844_534B), id: 1) // "HDSK"
+        let id = EventHotKeyID(signature: OSType(0x4241_5245), id: 1) // "BARE"
         let status = RegisterEventHotKey(UInt32(keyCode), UInt32(modifiers), id, GetApplicationEventTarget(), 0, &ref)
         if status != noErr { return nil }
     }

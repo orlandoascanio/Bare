@@ -1,6 +1,6 @@
-# HideDesktop
+# Bare
 
-Free and open-source macOS menu bar app that hides your Desktop icons. You can hide all of them or pick what goes: just folders, just screenshots, everything except apps, and so on.
+**A bare Desktop, one click away.** Bare is a free, open-source macOS menu bar app that hides your Desktop icons. You can hide all of them or pick what goes: just folders, just screenshots, everything except apps, and so on.
 
 On Windows this is right-click → View → Show desktop icons. On macOS people are charging money for it. Not here.
 
@@ -29,17 +29,17 @@ On Windows this is right-click → View → Show desktop icons. On macOS people 
 You need Xcode or the Xcode Command Line Tools (`xcode-select --install`). macOS 13 Ventura or newer.
 
 ```bash
-git clone https://github.com/orlandoascanio/HideDesktop.git && cd HideDesktop
+git clone https://github.com/orlandoascanio/Bare.git && cd Bare
 ./build.sh --install
 ```
 
-That builds `HideDesktop.app`, copies it to `/Applications` and launches it. Look for the 👁 icon in the menu bar. The first time it touches your Desktop, macOS asks for permission to access the Desktop folder. Click **Allow**.
+That builds `Bare.app`, copies it to `/Applications` and launches it. Look for the 👁 icon in the menu bar. The first time it touches your Desktop, macOS asks for permission to access the Desktop folder. Click **Allow**.
 
-To only build: `./build.sh` (the result goes in `build/HideDesktop.app`).
+To only build: `./build.sh` (the result goes in `build/Bare.app`).
 
 ## How it works
 
-HideDesktop sets the standard macOS **hidden** file flag on Desktop items, the same flag `chflags hidden` sets. Finder stops drawing them right away, with no restart.
+Bare sets the standard macOS **hidden** file flag on Desktop items, the same flag `chflags hidden` sets. Finder stops drawing them right away, with no restart.
 
 - Files are **never moved, renamed or deleted**. They're still in `~/Desktop`, still in Finder sidebar searches, still openable from apps.
 - It remembers exactly which items it hid, so "Show" only un-hides those. Anything you hid yourself stays hidden.
@@ -55,7 +55,7 @@ HideDesktop sets the standard macOS **hidden** file flag on Desktop items, the s
 ## Project layout
 
 ```
-Sources/HideDesktop/
+Sources/Bare/
   main.swift          app entry point (menu bar only)
   AppDelegate.swift   status item, menu, actions, launch at login
   DesktopHider.swift  hide/show logic, Desktop watcher, drive settings
@@ -68,7 +68,7 @@ Resources/Info.plist
 build.sh
 ```
 
-Website: https://www.orlandoascanio.com/products/hidedesktop
+Website: https://www.orlandoascanio.com/products/bare
 
 ## License
 

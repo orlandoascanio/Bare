@@ -173,8 +173,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(item("Open Desktop Folder", #selector(openDesktop), symbol: "folder"))
         menu.addItem(item("How It Works…", #selector(showOnboarding), symbol: "questionmark.circle"))
-        menu.addItem(item("HideDesktop Website", #selector(openWebsite), symbol: "globe"))
-        let quit = item("Quit HideDesktop", #selector(quit), symbol: "power")
+        menu.addItem(item("Bare Website", #selector(openWebsite), symbol: "globe"))
+        let quit = item("Quit Bare", #selector(quit), symbol: "power")
         quit.keyEquivalent = "q"
         menu.addItem(quit)
     }
@@ -270,7 +270,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let model = OnboardingModel(counts: counts,
                                     apply: { [weak self] in self?.hider.apply() },
                                     toggle: { [weak self] in self?.toggleHiding() })
-        WindowPresenter.show(id: "onboarding", title: "Welcome to HideDesktop", translucent: true) {
+        WindowPresenter.show(id: "onboarding", title: "Welcome to Bare", translucent: true) {
             OnboardingView(model: model) { WindowPresenter.close(id: "onboarding") }
         }
     }
@@ -291,7 +291,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } catch {
             let alert = NSAlert()
             alert.messageText = "Couldn't change Launch at Login"
-            alert.informativeText = "\(error.localizedDescription)\n\nTip: move HideDesktop.app into /Applications first."
+            alert.informativeText = "\(error.localizedDescription)\n\nTip: move Bare.app into /Applications first."
             NSApp.activate(ignoringOtherApps: true)
             alert.runModal()
         }
@@ -303,8 +303,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func showDesktopAccessAlert() {
         let alert = NSAlert()
-        alert.messageText = "HideDesktop can't access your Desktop folder"
-        alert.informativeText = "Allow it in System Settings → Privacy & Security → Files & Folders → HideDesktop → Desktop Folder, then try again."
+        alert.messageText = "Bare can't access your Desktop folder"
+        alert.informativeText = "Allow it in System Settings → Privacy & Security → Files & Folders → Bare → Desktop Folder, then try again."
         alert.addButton(withTitle: "Open Privacy Settings")
         alert.addButton(withTitle: "Later")
         NSApp.activate(ignoringOtherApps: true)
