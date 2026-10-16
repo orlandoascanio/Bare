@@ -33,19 +33,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     // MARK: Status item
 
+    private var pendingToggle: DispatchWorkItem?
+    private var lastToggleTime: TimeInterval = 0
+
+    /// Click = hide/show, double-click / right-click / ⌥-click = menu.
     @objc private func statusItemClicked() {
         let event = NSApp.currentEvent
         let flags = event?.modifierFlags ?? []
-        let wantsMenu = !settings.clickToToggle
+        let forceMenu = !settings.clickToToggle
             || event?.type == .rightMouseUp
             || flags.contains(.option) || flags.contains(.control)
 
-        if wantsMenu {
-            statusItem.menu = menu
-            statusItem.button?.performClick(nil)
+        if forceMenu {
+            openMenu()
+        } else if (event?.clickCount ?? 1) >= 2 {
+            // Second click of a double-click: cancel the toggle (or undo it if it already ran).
+            if let pending = pendingToggle {
+                pending.cancel()
+                pendingToggle = nil
+            } else if ProcessInfo.processInfo.systemUptime - lastToggleTime < NSEvent.doubleClickInterval {
+                toggleHiding()
+            }
+            openMenu()
         } else {
-            toggleHiding()
+            // Wait briefly to see if this becomes a double-click. Capped so a single click still feels instant.
+            let work = DispatchWorkItem { [weak self] in
+                guard let self else { return }
+                self.pendingToggle = nil
+                self.lastToggleTime = ProcessInfo.processInfo.systemUptime
+                self.toggleHiding()
+            }
+            pendingToggle?.cancel()
+            pendingToggle = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + min(NSEvent.doubleClickInterval, 0.25), execute: work)
         }
+    }
+
+    private func openMenu() {
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
     }
 
     func menuDidClose(_ menu: NSMenu) {
@@ -135,7 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(option("Auto-hide new items (screenshots, downloads…)", settings.autoHideNew,
                             #selector(toggleAutoHide)))
         menu.addItem(option("Global shortcut ⌃⌥⌘H", settings.hotKeyEnabled, #selector(toggleHotKey)))
-        menu.addItem(option("Left-click icon to toggle (right-click for menu)", settings.clickToToggle,
+        menu.addItem(option("Click icon to hide · double-click for menu", settings.clickToToggle,
                             #selector(toggleClickMode)))
         menu.addItem(option("Show icons again when quitting", settings.restoreOnQuit,
                             #selector(toggleRestoreOnQuit)))

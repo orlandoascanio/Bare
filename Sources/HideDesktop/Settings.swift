@@ -50,7 +50,7 @@ final class Settings {
             "hideDrives": false,
             "autoHideNew": true,
             "restoreOnQuit": true,
-            "clickToToggle": false,
+            "clickToToggle": true,
             "hotKeyEnabled": true,
         ])
     }
